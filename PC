@@ -1,0 +1,16 @@
+## A small module that:
+
+1.Increments the address (usually PC + 4 for 32-bit instructions)
+2.Allows branching/jumping
+
+CODE:
+module program_counter (
+    input logic clk,
+    input logic reset,
+    input logic [31:0] pc_next,
+    output logic [31:0] pc
+);
+    always_ff @(posedge clk or posedge reset)
+        if (reset) pc <= 0;
+        else pc <= pc_next;
+endmodule
