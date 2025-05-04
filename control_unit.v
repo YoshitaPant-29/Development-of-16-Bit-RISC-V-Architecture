@@ -65,3 +65,17 @@ always @(*) begin
 end
 
 endmodule
+
+
+-->Key Output Signals:
+alu_src: Whether to use immediate (1) or register (0) as ALU operand.
+
+alu_op: ALU operation code (you can refine logic using funct7 too).
+
+reg_write: Enables writing result back to register.
+
+mem_to_reg: Selects memory data for writing to register.
+
+mem_read / mem_write: Enable memory access.
+
+branch / jump: Activate PC redirection logic.
