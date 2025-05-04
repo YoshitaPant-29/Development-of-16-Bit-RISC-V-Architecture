@@ -1,0 +1,30 @@
+(System integration)
+module top_module (
+    input logic clk,
+    input logic [15:0] in_a, in_b,
+    input logic [4:0] rs1, rs2, rd,
+    input logic [2:0] alu_ctrl,
+    input logic reg_write_en,
+    output logic [15:0] alu_result
+);
+    logic [15:0] reg_data1, reg_data2;
+
+    register_file rf (
+        .clk(clk),
+        .we(reg_write_en),
+        .rd_addr1(rs1),
+        .rd_addr2(rs2),
+        .wr_addr(rd),
+        .wr_data(in_a),      // sample write data
+        .rd_data1(reg_data1),
+        .rd_data2(reg_data2)
+    );
+
+    alu alu_unit (
+        .a(reg_data1),
+        .b(reg_data2),
+        .alu_ctrl(alu_ctrl),
+        .result(alu_result),
+        .zero()
+    );
+endmodule
