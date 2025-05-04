@@ -4,13 +4,17 @@
 2.Allows branching/jumping
 
 CODE:
-module program_counter (
-    input logic clk,
-    input logic reset,
-    input logic [31:0] pc_next,
-    output logic [31:0] pc
+// program_counter.v
+module pc_logic (
+    input [31:0] pc_current,
+    input [31:0] imm,
+    input jump_en,
+    input branch_en,
+    input [31:0] jump_target,
+    output [31:0] pc_next
 );
-    always_ff @(posedge clk or posedge reset)
-        if (reset) pc <= 0;
-        else pc <= pc_next;
+    assign pc_next = jump_en ? jump_target :
+                     branch_en ? pc_current + imm :
+                                 pc_current + 4;
 endmodule
+
