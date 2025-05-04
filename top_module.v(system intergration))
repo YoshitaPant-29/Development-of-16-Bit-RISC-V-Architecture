@@ -1,30 +1,68 @@
 (System integration)
 module top_module (
-    input logic clk,
-    input logic [15:0] in_a, in_b,
-    input logic [4:0] rs1, rs2, rd,
-    input logic [2:0] alu_ctrl,
-    input logic reg_write_en,
-    output logic [15:0] alu_result
+    input clk,
+    input rst
 );
-    logic [15:0] reg_data1, reg_data2;
+    // Internal wires for interconnecting components
+    wire [15:0] instr;       // Instruction
+    wire [15:0] PC;          // Program Counter
+    wire [15:0] ALU_out;     // ALU result
+    wire [15:0] rs1_data, rs2_data; // Register file outputs
+    wire ALU_zero, ALU_carry;       // ALU flags
+    wire [3:0] control_signals;     // Control signals from control unit
 
-    register_file rf (
+    // Program counter
+    program_counter u_pc (
         .clk(clk),
-        .we(reg_write_en),
-        .rd_addr1(rs1),
-        .rd_addr2(rs2),
-        .wr_addr(rd),
-        .wr_data(in_a),      // sample write data
-        .rd_data1(reg_data1),
-        .rd_data2(reg_data2)
+        .rst(rst),
+        .next_PC(PC + 2),  // Example for a simple PC increment
+        .PC(PC)
     );
 
-    alu alu_unit (
-        .a(reg_data1),
-        .b(reg_data2),
-        .alu_ctrl(alu_ctrl),
-        .result(alu_result),
-        .zero()
+    // Fetch instruction from memory (assuming instruction memory is connected here)
+    instruction_memory u_instr_mem (
+        .addr(PC),
+        .instr(instr)
     );
+
+    // Control Unit (decodes instruction and generates control signals)
+    control_unit u_control_unit (
+        .instr(instr),
+        .control_signals(control_signals)
+    );
+
+    // Decoder (decodes instruction into register addresses and immediate)
+    decoder u_decoder (
+        .instr(instr),
+        .rs1_addr(rs1_addr),
+        .rs2_addr(rs2_addr),
+        .imm(imm)
+    );
+
+    // Register file
+    register_file u_rf (
+        .clk(clk),
+        .rst(rst),
+        .read_addr1(rs1_addr),
+        .read_addr2(rs2_addr),
+        .write_addr(write_addr),
+        .write_data(ALU_out),
+        .reg_write(control_signals[0]), // Assuming bit 0 is for writing
+        .read_data1(rs1_data),
+        .read_data2(rs2_data)
+    );
+
+    // ALU (computes the result based on inputs from registers and immediate)
+    alu u_alu (
+        .a(rs1_data),
+        .b(rs2_data_or_imm), // MUX between register data and immediate
+        .op(control_signals[3:1]), // Control signals for ALU operation
+        .result(ALU_out),
+        .zero(ALU_zero),
+        .carry(ALU_carry)
+    );
+
+    // Handle other components like branch/jump, and final output handling here
+endmodule
+
 endmodule
