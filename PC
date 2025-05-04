@@ -3,6 +3,7 @@
 1.Increments the address (usually PC + 4 for 32-bit instructions)
 2.Allows branching/jumping
 
+
 CODE:
 // program_counter.v
 module pc_logic (
@@ -17,4 +18,33 @@ module pc_logic (
                      branch_en ? pc_current + imm :
                                  pc_current + 4;
 endmodule
+
+
+
+
+## Inputs:
+
+pc_current: The current program counter value.
+
+imm: Immediate value (used for branch offset).
+
+jump_en: If high, execute jump to jump_target.
+
+branch_en: If high, execute a conditional branch using imm.
+
+jump_target: Address to jump to if jump_en is enabled.
+
+Output:
+
+pc_next: Computed next PC value based on control signals.
+
+Logic:
+
+If jump_en is 1, jump to jump_target.
+
+Else, if branch_en is 1, add the immediate to the current PC.
+
+Else, increment PC by 4 (next instruction).
+
+
 
